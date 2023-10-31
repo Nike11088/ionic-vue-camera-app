@@ -11,9 +11,12 @@
           <ion-col
             size="6"
             :key="photo.filepath"
+            @click="showActionSheet(photo)"
             v-for="photo in photos"
           >
-            <ion-img :src="photo.webviewPath"></ion-img>
+            <ion-img 
+              :src="photo.webviewPath">
+            </ion-img>
           </ion-col>
         </ion-row>
       </ion-grid>
@@ -33,6 +36,7 @@
 <script setup lang="ts">
 import { camera, trash, close } from 'ionicons/icons'
 import {
+  actionSheetController,
   IonPage,
   IonHeader,
   IonFab,
@@ -44,9 +48,34 @@ import {
   IonGrid,
   IonRow,
   IonCol,
-  IonImg
+  IonImg,
 } from '@ionic/vue'
 import { usePhotoGallery, UserPhoto } from '@/composables/usePhotoGallery'
 
-const { photos, takePhoto } = usePhotoGallery()
+const { photos, takePhoto, deletePhoto } = usePhotoGallery()
+
+const showActionSheet = async (photo: UserPhoto) => {
+  const actionSheet = await actionSheetController.create({
+    header: 'Photos',
+    buttons: [
+      {
+        text: 'Delete',
+        role: 'destructive',
+        icon: trash,
+        handler: () => {
+          deletePhoto(photo)
+        },
+      },
+      {
+        text: 'Cancel',
+        icon: close,
+        role: 'cancel',
+        handler: () => {
+          // Nothing to do, action sheet is automatically closed
+        },
+      },
+    ],
+  })
+  await actionSheet.present()
+}
 </script>
